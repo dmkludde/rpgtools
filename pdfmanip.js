@@ -35,20 +35,22 @@ function namedFSpipe(evdat, pdat) {
 
 //Function that gets exported
 function createPDFs(eventAndPlayerData, chronicleData){
+	console.log(eventAndPlayerData);
+	console.log(chronicleData);
 	if(eventAndPlayerData.scenario != chronicleData.name){
 		console.log("Chronicledata does not match event, aborting PDF creation");
 	}
 	else {	
-		var eventData = eventAndPlayerData;
+		var eventData = eventAndPlayerData.eventData;
 		var playerData = eventAndPlayerData.playerData;
 
 		console.log('Creating raster.pdf');
-		var pipe = namedpipe(eventData, {})
+		var pipe = namedFSpipe(eventData, {})
 		createRasterPDF(chronicleData, eventData, {}, pipe);
 
 		for (var i=0; i< playerData.length; ++i){
 			if(playerData[i].charname){
-				var pipe = namedpipe(eventData, playerData[i])
+				var pipe = namedFSpipe(eventData, playerData[i])
 				createPDF(chronicleData, eventData, playerData[i], pipe);
 			}
 		}
@@ -65,8 +67,8 @@ function createPDF(cdat, evdat, pdat, thepipe) {
 
 function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
     // Create a document
-    doc = new PDFDocument({margin:[0,0,0,0]});
-    //doc = new PDFDocument({margins: {top:0, bottom:0}});
+    //doc = new PDFDocument({margin:[0,0,0,0]});
+    doc = new PDFDocument({margins: {top:0, bottom:0}});
     doc.pipe(thepipe);
     
 	//Add background image
@@ -87,6 +89,11 @@ function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
 				drawBox(doc, cdat.tiergoldboxes[i], isRaster);
 			}
 		}
+		writeLine(doc, evdat.eventname, cdat.eventname,		isRaster);
+        writeLine(doc, evdat.eventcode, cdat.eventcode,		isRaster);
+        writeLine(doc, evdat.date, 		cdat.date,			isRaster);
+        writeLine(doc, evdat.gmsig, 	cdat.gmsig, 		isRaster);
+        writeLine(doc, evdat.gmpfs, 	cdat.gmpfs,			isRaster);
 		
 		writeLine(doc, pdat.player, 	cdat.playerpos, 	isRaster);
 		writeLine(doc, pdat.charname, 	cdat.characterpos, 	isRaster);
@@ -94,11 +101,7 @@ function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
 		writeLine(doc, pdat.charnumber, cdat.charnumpos, 	isRaster);
 		writeLine(doc, pdat.faction, 	cdat.facpos, 		isRaster);
     	
-        writeLine(doc, evdat.eventname, cdat.eventname,		isRaster);
-        writeLine(doc, evdat.eventcode, cdat.eventcode,		isRaster);
-        writeLine(doc, evdat.date, 		cdat.date,			isRaster);
-        writeLine(doc, evdat.gmsig, 	cdat.gmsig, 		isRaster);
-        writeLine(doc, evdat.gmpfs, 	cdat.gmpfs,			isRaster);
+        
         
         if( (cdat.xpbox && !(pdat.xp==="")) || isRaster) { 
 			writeLine(doc, pdat.xp, cdat.xpbox, isRaster);
@@ -128,6 +131,7 @@ function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
         }
 		
         if(pdat.crossouts){
+			console.log(pdat);
             pdat.crossouts = JSON.parse(pdat.crossouts);
         }
 		
@@ -195,14 +199,23 @@ function writeLine(doc, text, posvec, isRaster){
 }
 
 function drawBox(doc, boxvec, isRaster){
-    doc.rect(boxvec[0], boxvec[1], boxvec[2], boxvec[3]).stroke();
+    doc.lineJoin('round')
+		.lineWidth(2)
+		.strokeColor('red');
+	doc.rect(boxvec[0], boxvec[1], boxvec[2], boxvec[3]).stroke();
 }
 
 function drawFillBox(doc, boxvec, isRaster){
 	if(isRaster){
+		doc.lineJoin('round')
+		.lineWidth(2)
+		.strokeColor('red');
 		doc.rect(boxvec[0], boxvec[1], boxvec[2], boxvec[3]).stroke();
 	}
 	else {
+		doc.lineJoin('round')
+		.lineWidth(2)
+		.strokeColor('red');
 		doc.rect(boxvec[0], boxvec[1], boxvec[2], boxvec[3]).fillOpacity(0.5).fillAndStroke("red", "red");
 	}
 }
