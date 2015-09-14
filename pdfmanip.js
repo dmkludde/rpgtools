@@ -21,6 +21,7 @@ var pagewidth = 620; //That's how big a page seems to be
 
 var outputdir = 'out/';
 var rastername = 'raster.pdf';
+var verbose = true;
 
 function namedFSpipe(evdat, pdat) {
 	if( pdat.charname){
@@ -29,22 +30,31 @@ function namedFSpipe(evdat, pdat) {
 	else {
 		filename = rastername;
 	}
-	console.log('Creating ' + filename);
+	if(verbose){
+		console.log('Creating ' + filename);
+	}
 	return fs.createWriteStream(outputdir + filename);
 };
 
 //Function that gets exported
 function createPDFs(eventAndPlayerData, chronicleData){
-	console.log(eventAndPlayerData);
-	console.log(chronicleData);
+	if(verbose){
+		console.log(eventAndPlayerData);
+		console.log(chronicleData);
+	}
 	if(eventAndPlayerData.scenario != chronicleData.name){
-		console.log("Chronicledata does not match event, aborting PDF creation");
+		if(verbose){
+			console.log("Chronicledata does not match event, aborting PDF creation");
+			console.log(eventAndPlayerData.scenario);
+			console.log(chronicleData.name);
+		}
+		
 	}
 	else {	
-		var eventData = eventAndPlayerData.eventData;
+		var eventData = eventAndPlayerData;//.eventData;
 		var playerData = eventAndPlayerData.playerData;
 
-		console.log('Creating raster.pdf');
+		//console.log('Creating raster.pdf');
 		var pipe = namedFSpipe(eventData, {})
 		createRasterPDF(chronicleData, eventData, {}, pipe);
 
@@ -75,17 +85,19 @@ function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
 	doc.image(cdat.imagename, 0, 0, {width : pagewidth})
 	.save()
 	
+	//Draw raster lines 
 	if(isRaster){
 		drawRasterLines(doc);
 	}
 	
+	//Does not stop if no pdat is provided, since charname is not equal to ""
 	if(pdat.charname === ""){
         console.log('Player is empty')
     }
     
 	else {
         for (var i=0; i<cdat.tiergoldboxes.length; ++i){
-			if(isRaster || (!(pdat.tier ==="" && pdat.tier == i))){
+			if(isRaster || ( !(pdat.tier ==="") && pdat.tier == i ) ){
 				drawBox(doc, cdat.tiergoldboxes[i], isRaster);
 			}
 		}
@@ -103,7 +115,7 @@ function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
     	
         
         
-        if( (cdat.xpbox && !(pdat.xp==="")) || isRaster) { 
+        if( cdat.xpbox &&  (!(pdat.xp==="") || isRaster) ){ 
 			writeLine(doc, pdat.xp, cdat.xpbox, isRaster);
         }
 		
@@ -126,13 +138,16 @@ function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
         doc.fontSize(8);
         if (cdat.gminitial) {
             for (var i=0; i<cdat.gminitial.length; ++i){
-                    writeLine(doc, evdat.gmsig, cdat.gminitial[i]);
+                    writeLine(doc, evdat.gmsig, cdat.gminitial[i], isRaster);
             }
         }
 		
         if(pdat.crossouts){
-			console.log(pdat);
-            pdat.crossouts = JSON.parse(pdat.crossouts);
+			if(verbose){
+				console.log(pdat);
+			}
+			pdat.crossouts = JSON.parse(pdat.crossouts);
+
         }
 		
 		if(isRaster){
@@ -141,15 +156,24 @@ function createPDFByLine(cdat, evdat, pdat, thepipe, isRaster){
 			}
 		}
 		else {
-			for (var i=0; i< pdat.crossouts.length; ++i){
-				if(cdat.crossouts.length < pdat.crossouts[i]){
-					console.log('Crossout number ' + pdat.crossouts[i] + ' is not defined');
-				}
-				else{
-					drawFillBox(doc, cdat.crossouts[pdat.crossouts[i]]);
+			if(pdat.crossouts){
+			//console.log(pdat);
+			//console.log(pdat.crossouts);
+			//console.log(cdat.crossouts);
+				for (var i=0; i< pdat.crossouts.length; ++i){
+					if(cdat.crossouts.length < pdat.crossouts[i]){
+						console.log('Crossout number ' + pdat.crossouts[i] + ' is not defined');
+					}
+					else {
+						if(verbose){
+							console.log('Drawing crossout ' + pdat.crossouts[i]);
+						}
+						drawFillBox(doc, cdat.crossouts[pdat.crossouts[i]], isRaster);
+					}
 				}
 			}
 		}
+		
     }
     // Finalize PDF file
     doc.end();
@@ -183,7 +207,10 @@ function drawRasterLines(doc){
 }
 
 function writeLine(doc, text, posvec, isRaster){
-	if(isRaster){
+	if (verbose){				
+		console.log(" txt " + text + " pv " + posvec + " ? " + isRaster);
+	}
+    if(isRaster){
 		doc.lineJoin('round')
 		.lineWidth(2)
 		.strokeColor('red');
@@ -199,14 +226,20 @@ function writeLine(doc, text, posvec, isRaster){
 }
 
 function drawBox(doc, boxvec, isRaster){
-    doc.lineJoin('round')
+	if (verbose){					
+		console.log(" bv " + boxvec + " ? " + isRaster);
+	}
+	doc.lineJoin('round')
 		.lineWidth(2)
 		.strokeColor('red');
 	doc.rect(boxvec[0], boxvec[1], boxvec[2], boxvec[3]).stroke();
 }
 
 function drawFillBox(doc, boxvec, isRaster){
-	if(isRaster){
+	if (verbose){					
+		console.log(" bv " + boxvec + " ? " + isRaster);
+	}
+    if(isRaster){
 		doc.lineJoin('round')
 		.lineWidth(2)
 		.strokeColor('red');
@@ -216,8 +249,9 @@ function drawFillBox(doc, boxvec, isRaster){
 		doc.lineJoin('round')
 		.lineWidth(2)
 		.strokeColor('red');
+		//doc.rect(boxvec[0], boxvec[1], boxvec[2], boxvec[3]).stroke();
 		doc.rect(boxvec[0], boxvec[1], boxvec[2], boxvec[3]).fillOpacity(0.5).fillAndStroke("red", "red");
 	}
 }
 
-module.exports = createPDFs;
+module.exports = { createPDFs: createPDFs, createPDF : createPDF, createRasterPDF : createRasterPDF };

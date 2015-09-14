@@ -1,5 +1,6 @@
 pdf = require('./pdfmanip.js');
-
+evedata = require('./eventdata.js');
+chrondata = require('./chrondata.js');
 testchron = { 
     "S02E21": {
 	"imagename" : "images/S02E21.png",
@@ -18,6 +19,7 @@ testchron = {
 	"ppbox" : [505, 333, 40],
 	"gpbox" : [505, 460, 40],
 	"djbox" : [505, 493, 40],
+	"gminitial" : [[565, 333, 20], [565, 460, 20],[565, 493, 20]],
 	"djannotation" : [55, 605, 130],
 	"crossouts" : [[40,210, 430, 100], [40, 320, 430 ,75], [40, 405, 430,140]] 
     }
@@ -43,71 +45,20 @@ testevent = {
 	    "pp" : "2",
 	    "gp" : "430",
 	    "dj" : "0",
-	    "crossouts" : "[]"
-	},
-	{   
-    	    "player" : "Derek Well",
-    	    "charname" : "Wulfren",
-    	    "number" : "85794",
-    	    "charnumber" : "11",
-    	    "faction" : "A",
-    	    "tier" : 0,
-	    "pp" : "2",
-	    "gp" : "430",
-	    "dj" : "0",
-	    "crossouts" : "[]"
-	},
-	{   
-    	    "player" : "Cyril Corbaz",
-    	    "charname" : "Veviane",
-    	    "number" : "76446",
-    	    "charnumber" : "10",
-    	    "faction" : "GL",
-    	    "tier" : 0,
-	    "pp" : "2",
-	    "gp" : "430",
-	    "dj" : "0",
-	    "crossouts" : "[]"
-	},
-	{   
-    	    "player" : "Anon A Mouse",
-    	    "charname" : "Liam Quinn Faolan",
-    	    "number" : "129459",
-    	    "charnumber" : "2",
-    	    "faction" : "V",
-    	    "tier" : 0,
-	    "pp" : "2",
-	    "gp" : "430",
-	    "dj" : "50",
-	    "crossouts" : "[]"
-	},
-	{   
-    	    "player" : "Pedwiddle",
-    	    "charname" : "Anaristiel",
-    	    "number" : "70085",
-    	    "charnumber" : "9",
-    	    "faction" : "V",
-    	    "tier" : 0,
-	    "pp" : "2",
-	    "gp" : "430",
-	    "dj" : "0",
-	    "crossouts" : "[]"
-	},
-	{   
-    	    "player" : "Broken Prince",
-    	    "charname" : "Arcad",
-    	    "number" : "113331",
-    	    "charnumber" : "13",
-    	    "faction" : "V",
-    	    "tier" : 0,
-	    "pp" : "2",
-	    "gp" : "430",
-	    "dj" : "0",
-	    "crossouts" : "[]"
-	}               
-               
+	    "crossouts" : "[0,1,2]"
+	}      
                
     ]
 };
 
-pdf(testevent, testchron.S02E21);
+
+evdat = evedata.S06E22II;
+cdat = chrondata.S06E22;
+for (key in cdat) {
+	console.log(key);
+		
+}
+pdf.createPDFs(evdat, cdat);
+//evdat = evedata.S06E23;
+//cdat = chrondata.S06E23;
+//pdf.createPDFs(evdat, cdat);
