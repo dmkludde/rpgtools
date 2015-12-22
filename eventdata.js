@@ -265,7 +265,8 @@ S06E98II : {
       "pp": "2",
       "xp": "1",
       "gp": "510",
-      "dj": "10",
+      "dj": "0",
+      "comment": "DMK: Rolled > 15 on int check to forgo downtime",
       "crossouts": "[0,1,2,4]"
     },
     {

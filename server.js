@@ -4,61 +4,51 @@
 // get all the tools we need
 var express  = require('express');
 var app      = express();
-var port     = process.env.PORT || 8080;
-var pdfmanip = require('./pdfmanip.js');
-//var mongoose = require('mongoose');
-//var passport = require('passport');
-//var flash    = require('connect-flash');
-var bodyParser = require('body-parser');
-var morgan = require('morgan');
-var cookieParser = require('cookie-parser');
+var port     = process.env.PORT || 8081;
 
-//var config = require('./config/config.js');
-//console.log(config);
+var mongoose        = require('mongoose');
+var passport        = require('passport');
+var bodyParser      = require('body-parser');
+var morgan          = require('morgan');
+var cookieParser    = require('cookie-parser');
+var session         = require('express-session');
 
-//var configDB = require('./config/database.js')(config);
+//Should probably move this to relevant routes section
+var pdfmanip        = require('./pdfmanip.js');
+
+var config          = require('./config/config.js');
+
+var configDB        = require('./config/database.js')(config);
+
+var routes   = require('./app/routes.js');
+var security = require('./config/passport'); // pass passport for configuration
 
 // configuration ===============================================================
-//mongoose.connect(configDB.url); // connect to our database
 
-//require('./config/passport')(passport); // pass passport for configuration
+console.log(configDB.url)
 
-//app.configure(function() {
 
-	// set up our express application
-//	app.use(express.logger('dev')); // log every request to the console
-	app.use(cookieParser()); // read cookies (needed for auth)
-	//app.use(express.bodyParser()); // get information from html forms
-    app.use( bodyParser.json() );       // to support JSON-encoded bodies
-    app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-        extended: true
-    })); 
-//    app.use(express.json());       // to support JSON-encoded bodies
-//    app.use(express.urlencoded()); // to support URL-encoded bodies
-    app.use('/static', express.static(__dirname + '/static'));
-    app.use('/bower_components', express.static(__dirname + '/bower_components'));
-    app.use(morgan('combined'));  // log every request to the console
+    
 
-//	app.set('view engine', 'ejs'); // set up ejs for templating
+mongoose.connect(configDB.url); // connect to our database
 
-	// required for passport
-//	app.use(express.session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
-//	app.use(passport.initialize());
-//	app.use(passport.session()); // persistent login sessions
-//	app.use(flash()); // use connect-flash for flash messages stored in session
+security.init(app, passport, session);
 
-//});
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
+//app.use(bodyParser()); // get information from html forms
 
-app.get('/', function(req, res){
-    res.redirect('/static/index.html');
-});
+app.use(bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+})); 
 
-// routes ======================================================================
-app.post('/pdfs', function(req,res){
-    evdata = req.body;
-    pdfmanip(req.body);
-    res.send(req.body);
-});
+app.use('/static', express.static(__dirname + '/static'));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
+
+routes(app, passport);
+
+
 
 
 // launch ======================================================================

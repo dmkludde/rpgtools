@@ -74,7 +74,8 @@ chrondata = {
 						[s6east3, s6ppline, s6eastcol], 
 						[s6east3, s6gpline, s6eastcol], 
 						[s6east3, s6djline, s6eastcol]
-					],						
+					],		
+		"commentbox" :[col2, s6lowenough -20, onecol],				
 		"djannotation" : [col2, s6lowenough, onecol],
 		"crossouts" : [ [col1, 190, twocol, 73], //0: DkAr
 						[col1, 265, twocol , 48], //1: LbEd
