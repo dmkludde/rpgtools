@@ -1,3 +1,4 @@
 node_modules/
 out/
 images/
+static/bower_components/

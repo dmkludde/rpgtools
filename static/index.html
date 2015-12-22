@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" ng-app="phonecatApp">
+<head>
+  <meta charset="utf-8">
+  <title>Generate JSON</title>
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="js/controllers.js"></script>
+</head>
+<body ng-controller="EnterStuffCtrl">
+
+  <div class="container-fluid">
+    <div class="row">
+      Filter by name <input type="text" ng-model="dbfiltername">
+      <button ng-click="getdbnames()">Get!</button>
+      Select a game from list
+      <select ng-model="selectwhich">
+        <option ng-repeat="dbname in dbnames.rows" value="{{dbname.key}}">{{dbname.key}}</option>
+      </select>
+      <button ng-click="fetchgame(selectwhich)">Get {{selectwhich}}</button>
+      <button ng-click="savedata()">Save</button>
+      <button ng-click="writedata()">Write</button>
+    </div>
+    <div class="row">
+
+      <div class="col-md-4">
+        <h3>Event</h3>
+        <!--Sidebar content-->
+        <table>
+        <tr ng-repeat="field in mainfields">
+          <td>{{field.name}}</td><td><input type="{{field.type}}" name="{{field.id}}" id="{{field.id}}" ng-model="formData[field.id]"></td>
+        </tr>
+        </table>
+
+        
+
+        
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+          <table>
+            <tr>
+              <th></th>
+            <th ng-repeat="fielda in repeatedfields">
+              {{fielda.name}}</th>
+            </tr>
+ 
+            <tr ng-repeat="number in numbers"> 
+              <td>Player {{number}}</td>
+              
+              <td ng-repeat="fielda in repeatedfields">
+                <input type="{{fielda.type}}" name="{{fielda.id}}" ng-model="formData.playerData[number][fielda.id]" value="{{fielda.default}}" size="{{fielda.name.length}}">
+              </td>
+            
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <pre>{{databaseMessage | json}}</pre>
+    <pre>{{formData | json}} </pre>
+
+  </div>
+
+</body>
+</html>
